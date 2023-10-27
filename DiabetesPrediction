@@ -1,0 +1,77 @@
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import StandardScaler 
+from sklearn.model_selection import train_test_split
+from sklearn import svm
+from sklearn.metrics import accuracy_score
+
+
+# Loading the diabetes dataset to a pandas Dataframe. 
+diabetesdataset = pd.read_csv('/content/diabetes.csv')
+
+# Printing the first 5 rows of the dataset.
+diabetesdataset.head()
+
+# Counting the total number of rows and columns in this dataset.
+diabetesdataset.shape
+
+
+# Getting the statistical measures of the data
+diabetesdataset.describe()
+diabetesdataset['Outcome'].value_counts()
+diabetesdataset.groupby('Outcome').mean()
+
+# Separating the data and labels
+X = diabetesdataset.drop(columns = 'Outcome', axis=1) 
+Y = diabetesdataset['Outcome']
+print(X)
+scaler  = StandardScaler()
+scaler.fit(X)
+standardized_data = scaler.transform(X)
+print (standardized_data)
+X = standardized_data
+Y = diabetesdataset['Outcome']
+print(X)
+print(Y)
+
+X_train, X_test, Y_train, Y_test = train_test_split(X,Y, test_size = 0.2, stratify=Y, random_state=2)
+
+print(X.shape, X_train.shape, X_test.shape)
+
+# Training the Model
+classifier = svm.SVC(kernel='linear')
+
+# Training the support vector machine classifier
+classifier.fit(X_train, Y_train)
+
+# Model evalution and Accuracy score on the training data
+X_train_prediction = classifier.predict(X_train)
+training_dataaccuracy = accuracy_score(X_train_prediction, Y_train)
+
+print('Accuracy score of the training data :', training_dataaccuracy)
+
+# Accuracy score on the testing data
+X_test_prediction = classifier.predict(X_test)
+testing_dataaccuracy = accuracy_score(X_test_prediction, Y_test)
+
+print('Accuracy score of the testing data :', testing_dataaccuracy)
+
+input_data = (10,115,0,0,0,35.3,0.134,29)
+
+# Changing the input data to numpy array
+input_data_as_numpyarray = np.asarray(input_data)
+
+# Reshaping the array as we are predicitng for one instance 
+input_datareshaped = input_data_as_numpyarray.reshape(1,-1)
+
+# Standardised the input data
+std_data = scaler.transform(input_datareshaped)
+print(std_data)
+
+prediction = classifier.predict(std_data)
+print(prediction)
+
+if (prediction [0] == 0):
+  print('The person is not diabetic')
+else:
+  print('The person is diabetic')
